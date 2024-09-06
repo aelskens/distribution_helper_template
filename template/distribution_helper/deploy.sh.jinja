@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Note that the repository is from Ray's github instance rather than github.com
+helm repo add kuberay https://ray-project.github.io/kuberay-helm
+helm repo update
+helm install kuberay-operator kuberay/kuberay-operator --namespace ray --create-namespace
+
+helm install raycluster kuberay/ray-cluster \
+    --namespace ray \
+    --set image.repository={{ repository }} \
+    --set image.tag={{ tag }} \
+    --set worker.replicas={{ n_replicas }} \
+    --set worker.maxReplicas={{ n_max_replicas }} \
+    --set worker.resources.limits.cpu={{ worker_cpu }} \
+    --set worker.resources.requests.cpu={{ worker_cpu }} \
+    --set worker.resources.limits.memory={{ worker_memory }} \
+    --set worker.resources.requests.memory={{ worker_memory }}

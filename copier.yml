@@ -1,0 +1,31 @@
+# Set subdirectory to use as template root
+_subdirectory: template
+
+# Include jinja extensions
+_jinja_extensions:
+    - copier_templates_extensions.TemplateExtensionLoader
+    - extensions/context.py:ContextUpdater
+
+# Questions
+base_image:
+    type: str
+    help: The image that will be used to deploy the pods. Expected input format "[<namespace/>]<repository>:<tag>", the namespace is optional.
+
+worker_cpu:
+    type: float
+    default: 1
+    help: The number of CPUs you want for each worker. Keep in mind that this can be a decimal number.
+
+worker_memory:
+    type: str
+    default: 1G
+    help: The size of each worker's RAM in Gb. Expected input format "xu" where x is the amount and u is the unit's prefix (E, P, T, G, M, k), for example "100M" will refer to 100 megabytes.
+
+n_replicas:
+    type: int
+    help: The number of workers that should be deployed.
+
+n_max_replicas:
+    type: int
+    default: "{{ n_replicas + 5 }}"
+    help: The maximum number of workers that should be deployed.
