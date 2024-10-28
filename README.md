@@ -12,7 +12,8 @@ This template is based on [Ray's official documentation](https://docs.ray.io/en/
 │
 ├── deploy.sh                 <- The script that deploys the desired resources onto the K8S cluster.
 └── teardown.sh               <- The script that removes the deployment from the K8S cluster.
+│
+└── README.md                 <- The user guide.
 ```
 
-> [!NOTE]  
-> The base image from which the Ray Pods one will be derived should already have a non-root user.
+Make sure to check `.../distributed_helper/README.md` for a user guide.
