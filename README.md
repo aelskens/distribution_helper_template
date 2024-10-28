@@ -7,10 +7,11 @@ This template is based on [Ray's official documentation](https://docs.ray.io/en/
 ## Generated files
 
 ```
-├── Dockerfile     <- The Dockerfile to build the extended image that includes the necessary instructions for proper Ray Pods functionality
+├── Dockerfile                <- The Dockerfile to build the extended image that includes the necessary instructions for proper Ray Pods functionality.
+├── build_N_publish_image.sh  <- The script that builds the image for the pods by extending the given base image and publishes it.
 │
-├── deploy.sh      <- The script that deploys the desired resources onto the K8S cluster.
-└── teardown.sh    <- The script that removes the deployment from the K8S cluster.
+├── deploy.sh                 <- The script that deploys the desired resources onto the K8S cluster.
+└── teardown.sh               <- The script that removes the deployment from the K8S cluster.
 ```
 
 > [!NOTE]  
