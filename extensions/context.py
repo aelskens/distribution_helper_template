@@ -13,3 +13,6 @@ class ContextUpdater(ContextHook):
         base_image = context["base_image"]
         context["repository"] = base_image.split(":")[0]
         context["tag"] = base_image.split(":")[-1]
+
+        context["pod_tag"] = context["tag"] + "_distributed"
+        context["pod_image"] = context["repository"] + ":" + context["pod_tag"]

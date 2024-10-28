@@ -8,7 +8,7 @@ helm install kuberay-operator kuberay/kuberay-operator --namespace distributed-r
 helm install raycluster kuberay/ray-cluster \
     --namespace distributed-ray \
     --set image.repository={{ repository }} \
-    --set image.tag={{ tag }} \
+    --set image.tag={{ pod_tag }} \
     --set worker.replicas={{ n_replicas }} \
     --set worker.maxReplicas={{ n_max_replicas }} \
     --set worker.resources.limits.cpu={{ worker_cpu }} \
