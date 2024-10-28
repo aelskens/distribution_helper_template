@@ -1,4 +1,4 @@
 #!/bin/bash
 
-helm uninstall -n ray raycluster
-helm uninstall -n ray kuberay-operator
+helm uninstall -n distributed-ray raycluster
+helm uninstall -n distributed-ray kuberay-operator
