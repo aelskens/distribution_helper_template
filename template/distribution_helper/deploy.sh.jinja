@@ -1,5 +1,65 @@
 #!/bin/bash
 
+
+############################################################
+# Help function                                            #
+############################################################
+
+Help()
+{
+   echo "Deploy a RayCluster with specific ressources onto a K8S cluster."
+   echo
+   echo "Usage: deploy [OPTIONS]"
+   echo "Options:"
+   echo "-h, --help              Print this help message"
+   echo "-n, --n-replicas        Change the number of replicas"
+   echo "    --max-replicas      Change the maximum number of replicas, it should be equal or superior to the number of replicas"
+   echo "    --cpu-requests      Change the number of CPUs requested for each worker, it can be decimal"
+   echo "    --cpu-limits        Change the CPU limit that can be attributed to each worker, it should be equal or superior to the CPU request"
+   echo "    --memory-requests   Change the size of each worker's RAM in bytes. Expected input format "xu" where x is the amount and u is the unit's prefix (E, P, T, G, M, k), for example "100M" will refer to 100 megabytes."
+   echo "    --memory-limits     Change the limit for each worker's RAM size, it should be equal or superior to the memory request"
+}
+
+
+############################################################
+# Variable definition                                      #
+############################################################
+
+nreplicas={{ n_replicas }}
+nmaxreplicas={{ n_max_replicas }}
+cpurequests={{ worker_cpu }}
+cpulimits={{ worker_cpu }}
+memoryrequests={{ worker_memory }}
+memorylimits={{ worker_memory }}
+
+
+############################################################
+# Process the input options.                               #
+############################################################
+
+args=$(getopt -n "$(basename "$0")" -o hn: --long help,n-replicas:,max-replicas:,cpu-requests:,cpu-limits:,memory-requests:,memory-limits: -- "$@") || exit 1
+eval set -- "$args"
+
+while :; do
+    case $1 in
+        -h|--help) Help; exit;;
+        -n|--n-replicas) nreplicas=$2; shift 2;;
+        --max-replicas) nmaxreplicas=$2; shift 2;;
+        --cpu-requests) cpurequests=$2; shift 2;;
+        --cpu-limits) cpulimits=$2; shift 2;;
+        --memory-requests) memoryrequests=$2; shift 2;;
+        --memory-limits) memorylimits=$2; shift 2;;
+        *) shift; break;;
+        \?) echo "Error: Invalid option."; exit;;
+    esac
+done
+
+if (( $nmaxreplicas < $nreplicas )); then echo "Maximum number of replicas (= $nmaxreplicas) cannot be inferior to the number of replicas (= $nreplicas)."; exit; fi 
+
+############################################################
+# Main program.                                            #
+############################################################
+
 # Note that the repository is from Ray's github instance rather than github.com
 helm repo add kuberay https://ray-project.github.io/kuberay-helm
 helm repo update
@@ -9,9 +69,9 @@ helm install raycluster kuberay/ray-cluster \
     --namespace distributed-ray \
     --set image.repository={{ repository }} \
     --set image.tag={{ pod_tag }} \
-    --set worker.replicas={{ n_replicas }} \
-    --set worker.maxReplicas={{ n_max_replicas }} \
-    --set worker.resources.limits.cpu={{ worker_cpu }} \
-    --set worker.resources.requests.cpu={{ worker_cpu }} \
-    --set worker.resources.limits.memory={{ worker_memory }} \
-    --set worker.resources.requests.memory={{ worker_memory }}
+    --set worker.replicas=$nreplicas \
+    --set worker.maxReplicas=$nmaxreplicas \
+    --set worker.resources.requests.cpu=$cpurequests \
+    --set worker.resources.limits.cpu=$cpulimits \
+    --set worker.resources.requests.memory=$memoryrequests \
+    --set worker.resources.limits.memory=$memorylimits
