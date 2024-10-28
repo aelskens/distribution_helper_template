@@ -19,7 +19,7 @@ worker_cpu:
 worker_memory:
     type: str
     default: 1G
-    help: The size of each worker's RAM in Gb. Expected input format "xu" where x is the amount and u is the unit's prefix (E, P, T, G, M, k), for example "100M" will refer to 100 megabytes.
+    help: The size of each worker's RAM in bytes. Expected input format "xu" where x is the amount and u is the unit's prefix (E, P, T, G, M, k), for example "100M" will refer to 100 megabytes.
 
 n_replicas:
     type: int
