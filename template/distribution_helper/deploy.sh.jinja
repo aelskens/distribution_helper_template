@@ -63,9 +63,9 @@ if (( $nmaxreplicas < $nreplicas )); then echo "Maximum number of replicas (= $n
 # Note that the repository is from Ray's github instance rather than github.com
 helm repo add kuberay https://ray-project.github.io/kuberay-helm
 helm repo update
-helm install kuberay-operator kuberay/kuberay-operator --namespace distributed-ray --create-namespace
+helm upgrade --install kuberay-operator kuberay/kuberay-operator --create-namespace --namespace distributed-ray
 
-helm install raycluster kuberay/ray-cluster \
+helm upgrade --install raycluster kuberay/ray-cluster \
     --namespace distributed-ray \
     --set image.repository={{ repository }} \
     --set image.tag={{ pod_tag }} \
