@@ -11,6 +11,7 @@ This template is based on [Ray's official documentation](https://docs.ray.io/en/
 ├── build_N_publish_image.sh  <- The script that builds the image for the pods by extending the given base image and publishes it.
 │
 ├── deploy.sh                 <- The script that deploys the desired resources onto the K8S cluster.
+├── values.yaml               <- A configuration file that is used to overwrite some of the ray-cluster helm chart default values.
 └── teardown.sh               <- The script that removes the deployment from the K8S cluster.
 │
 └── README.md                 <- The user guide.
