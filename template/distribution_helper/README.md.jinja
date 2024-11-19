@@ -11,6 +11,7 @@ This is based on [Ray's official documentation](https://docs.ray.io/en/latest/cl
 ├── build_N_publish_image.sh  <- The script that builds the image for the pods by extending the given base image and publishes it.
 │
 ├── deploy.sh                 <- The script that deploys the desired resources onto the K8S cluster.
+├── values.yaml               <- A configuration file that is used to overwrite some of the ray-cluster helm chart default values.
 └── teardown.sh               <- The script that removes the deployment from the K8S cluster.
 │
 └── README.md                 <- The user guide.
@@ -29,7 +30,8 @@ Use `build_N_publish_image.sh` to build the pods' image. This script will build 
 
 Use `deploy.sh` to deploy the RayCluster under the namespace `distributed-ray`.
 
-Additionally, you can overwrite some of the values defined in `deploy.sh` under the "Variable definition" section using the CLI. Use `deploy.sh --help` for more information.
+> **NOTE**  
+> You can overwrite some of the values defined in `deploy.sh` under the "Variable definition" section using the CLI. Use `deploy.sh --help` for more information. Additionally, you can use the configuration file named `values.yaml` to set even more values.
 
 ### 3. Teardown the RayCluster
 

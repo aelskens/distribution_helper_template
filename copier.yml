@@ -29,3 +29,8 @@ n_max_replicas:
     type: int
     default: "{{ n_replicas + 5 }}"
     help: The maximum number of workers that should be deployed.
+
+pvc_name:
+    type: str
+    default: nas-nfs
+    help: The name of the persistent volume claim deployed onto the K8s cluster.

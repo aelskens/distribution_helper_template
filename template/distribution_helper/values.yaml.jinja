@@ -1,0 +1,12 @@
+worker:
+  volumes:
+    - name: log-volume
+      emptyDir: {}
+    - name: data
+      persistentVolumeClaim:
+        claimName: {{ pvc_name }}
+  volumeMounts:
+    - mountPath: /tmp/ray
+      name: log-volume
+    - mountPath: /data
+      name: data

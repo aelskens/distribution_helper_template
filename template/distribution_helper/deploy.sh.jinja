@@ -74,4 +74,5 @@ helm upgrade --install raycluster kuberay/ray-cluster \
     --set worker.resources.requests.cpu=$cpurequests \
     --set worker.resources.limits.cpu=$cpulimits \
     --set worker.resources.requests.memory=$memoryrequests \
-    --set worker.resources.limits.memory=$memorylimits
+    --set worker.resources.limits.memory=$memorylimits \
+    --values "$(dirname $0)/values.yaml"
