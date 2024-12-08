@@ -27,7 +27,7 @@ n_replicas:
 
 n_max_replicas:
     type: int
-    default: "{{ n_replicas + 5 }}"
+    default: "{{ n_replicas + 10 }}"
     help: The maximum number of workers that should be deployed.
 
 pvc_name:

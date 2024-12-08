@@ -1,4 +1,55 @@
+head:
+  # If `enableInTreeAutoscaling` is true, the Autoscaler sidecar will be added to the Ray head pod.
+  # Ray Autoscaler integration is Beta with KubeRay >= 0.3.0 and Ray >= 2.0.0.
+  enableInTreeAutoscaling: true
+  # `autoscalerOptions` is an OPTIONAL field specifying configuration overrides for the Ray Autoscaler.
+  # The example configuration shown below represents the DEFAULT values.
+  # (You may delete autoscalerOptions if the defaults are suitable.)
+  autoscalerOptions:
+    # `upscalingMode` is "Default" or "Aggressive."
+    # Conservative: Upscaling is rate-limited; the number of pending worker pods is at most the size of the Ray cluster.
+    # Default: Upscaling is not rate-limited.
+    # Aggressive: An alias for Default; upscaling is not rate-limited.
+    upscalingMode: Default
+    # `idleTimeoutSeconds` is the number of seconds to wait before scaling down a worker pod which is not using Ray resources.
+    idleTimeoutSeconds: 60
+    # `image` optionally overrides the Autoscaler's container image. The Autoscaler uses the same image as the Ray container by default.
+    ## image: "my-repo/my-custom-autoscaler-image:tag"
+    # `imagePullPolicy` optionally overrides the Autoscaler container's default image pull policy (IfNotPresent).
+    imagePullPolicy: IfNotPresent
+    # Optionally specify the Autoscaler container's securityContext.
+    securityContext: {}
+    env: []
+    envFrom: []
+    # resources specifies optional resource request and limit overrides for the Autoscaler container.
+    # The default Autoscaler resource limits and requests should be sufficient for production use-cases.
+    # However, for large Ray clusters, we recommend monitoring container resource usage to determine if overriding the defaults is required.
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+  rayStartParams:
+    # Setting "num-cpus: 0" to avoid any Ray actors or tasks being scheduled on the Ray head Pod.
+    num-cpus: "0"
+  ports:
+    - containerPort: 6379
+      name: gcs
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh","-c","ray stop"]
+  env:
+    - name: RAY_enable_autoscaler_v2 # Pass env var for the autoscaler v2.
+      value: "1"
 worker:
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh","-c","ray stop"]
+  restartPolicy: Never # Never restart a pod to avoid pod reuse
   volumes:
     - name: log-volume
       emptyDir: {}
