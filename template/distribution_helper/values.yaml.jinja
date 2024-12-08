@@ -37,6 +37,10 @@ head:
   ports:
     - containerPort: 6379
       name: gcs
+    - containerPort: 8265
+      name: dashboard
+    - containerPort: 10001
+      name: client
   lifecycle:
     preStop:
       exec:
@@ -45,6 +49,7 @@ head:
     - name: RAY_enable_autoscaler_v2 # Pass env var for the autoscaler v2.
       value: "1"
 worker:
+  minReplicas: 0
   lifecycle:
     preStop:
       exec:
