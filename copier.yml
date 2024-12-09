@@ -11,6 +11,11 @@ base_image:
     type: str
     help: The image that will be used to deploy the pods. Expected input format "[<namespace/>]<repository>:<tag>", the namespace is optional.
 
+autoscaling:
+    type: bool
+    default: false
+    help: Autoscale the workers or not. In other words, whether the cluster should be handled dynamically or if the pods should be static.
+
 worker_cpu:
     type: float
     default: 1
@@ -24,10 +29,11 @@ worker_memory:
 n_replicas:
     type: int
     help: The number of workers that should be deployed.
+    when: "{{ not autoscaling }}"
 
 n_max_replicas:
     type: int
-    default: "{{ n_replicas + 10 }}"
+    default: "{{ n_replicas + 10 if n_replicas else 20}}"
     help: The maximum number of workers that should be deployed.
 
 pvc_name:

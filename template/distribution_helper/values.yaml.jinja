@@ -1,5 +1,5 @@
 head:
-  # If `enableInTreeAutoscaling` is true, the Autoscaler sidecar will be added to the Ray head pod.
+{% if autoscaling %}  # If `enableInTreeAutoscaling` is true, the Autoscaler sidecar will be added to the Ray head pod.
   # Ray Autoscaler integration is Beta with KubeRay >= 0.3.0 and Ray >= 2.0.0.
   enableInTreeAutoscaling: true
   # `autoscalerOptions` is an OPTIONAL field specifying configuration overrides for the Ray Autoscaler.
@@ -31,7 +31,14 @@ head:
       requests:
         cpu: "500m"
         memory: "512Mi"
-  rayStartParams:
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh","-c","ray stop"]
+  env:
+    - name: RAY_enable_autoscaler_v2 # Pass env var for the autoscaler v2.
+      value: "1"
+{% endif %}  rayStartParams:
     # Setting "num-cpus: 0" to avoid any Ray actors or tasks being scheduled on the Ray head Pod.
     num-cpus: "0"
   ports:
@@ -41,20 +48,9 @@ head:
       name: dashboard
     - containerPort: 10001
       name: client
-  lifecycle:
-    preStop:
-      exec:
-        command: ["/bin/sh","-c","ray stop"]
-  env:
-    - name: RAY_enable_autoscaler_v2 # Pass env var for the autoscaler v2.
-      value: "1"
 worker:
-  minReplicas: 0
-  lifecycle:
-    preStop:
-      exec:
-        command: ["/bin/sh","-c","ray stop"]
-  restartPolicy: Never # Never restart a pod to avoid pod reuse
+{% if autoscaling %}  disabled: true
+{% else %}  disabled: false
   volumes:
     - name: log-volume
       emptyDir: {}
@@ -66,3 +62,70 @@ worker:
       name: log-volume
     - mountPath: /data
       name: data
+{% endif %}additionalWorkerGroups:
+  # The map's key is used as the groupName.
+  smallGroup:
+  {% if autoscaling %}  disabled: false
+  {% else %}  disabled: true
+  {% endif %}  replicas: 0
+    minReplicas: 0
+    maxReplicas: {{ n_max_replicas }}
+    labels: {}
+    serviceAccountName: ""
+    restartPolicy: ""
+    rayStartParams: {}
+    # containerEnv specifies environment variables for the Ray container,
+    # Follows standard K8s container env schema.
+    containerEnv: []
+      # - name: EXAMPLE_ENV
+      #   value: "1"
+    envFrom: []
+        # - secretRef:
+        #     name: my-env-secret
+    # ports optionally allows specifying ports for the Ray container.
+    # ports: []
+    # resource requests and limits for the Ray head container.
+    # Modify as needed for your application.
+    # Note that the resources in this example are much too small for production;
+    # we don't recommend allocating less than 8G memory for a Ray pod in production.
+    # Ray pods should be sized to take up entire K8s nodes when possible.
+    # Always set CPU and memory limits for Ray pods.
+    # It is usually best to set requests equal to limits.
+    # See https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/config.html#resources
+    # for further guidance.
+    resources:
+      limits:
+        cpu: {{ worker_cpu }}
+        memory: {{ worker_memory }}
+      requests:
+        cpu: {{ worker_cpu }}
+        memory: {{ worker_memory }}
+    annotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    # Pod security context.
+    podSecurityContext: {}
+    # Ray container security context.
+    securityContext: {}
+    lifecycle:
+      preStop:
+        exec:
+          command: ["/bin/sh","-c","ray stop"]
+    restartPolicy: Never # Never restart a pod to avoid pod reuse
+    volumes:
+      - name: log-volume
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ pvc_name }}
+    volumeMounts:
+      - mountPath: /tmp/ray
+        name: log-volume
+      - mountPath: /data
+        name: data
+    sidecarContainers: []
+    # See docs/guidance/pod-command.md for more details about how to specify
+    # container command for worker Pod.
+    command: []
+    args: []

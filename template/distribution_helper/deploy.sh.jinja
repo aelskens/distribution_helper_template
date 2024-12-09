@@ -12,15 +12,15 @@ Help()
    echo "Usage: deploy [OPTIONS]"
    echo "Options:"
    echo "-h, --help              Print this help message"
-   echo "-n, --n-replicas        Change the number of replicas"
+{% if not autoscaling %}   echo "-n, --n-replicas        Change the number of replicas"
    echo "    --max-replicas      Change the maximum number of replicas, it should be equal or superior to the number of replicas"
    echo "    --cpu-requests      Change the number of CPUs requested for each worker, it can be decimal"
    echo "    --cpu-limits        Change the CPU limit that can be attributed to each worker, it should be equal or superior to the CPU request"
    echo "    --memory-requests   Change the size of each worker's RAM in bytes. Expected input format "xu" where x is the amount and u is the unit's prefix (E, P, T, G, M, k), for example "100M" will refer to 100 megabytes."
    echo "    --memory-limits     Change the limit for each worker's RAM size, it should be equal or superior to the memory request"
-}
 
-
+{% endif %}}
+{% if not autoscaling %}
 ############################################################
 # Variable definition                                      #
 ############################################################
@@ -31,12 +31,12 @@ cpurequests={{ worker_cpu }}
 cpulimits={{ worker_cpu }}
 memoryrequests={{ worker_memory }}
 memorylimits={{ worker_memory }}
-
+{% endif %}
 
 ############################################################
 # Process the input options.                               #
 ############################################################
-
+{% if not autoscaling %}
 args=$(getopt -n "$(basename "$0")" -o hn: --long help,n-replicas:,max-replicas:,cpu-requests:,cpu-limits:,memory-requests:,memory-limits: -- "$@") || exit 1
 eval set -- "$args"
 
@@ -55,6 +55,18 @@ while :; do
 done
 
 if (( $nmaxreplicas < $nreplicas )); then echo "Maximum number of replicas (= $nmaxreplicas) cannot be inferior to the number of replicas (= $nreplicas)."; exit; fi 
+{% else %}
+args=$(getopt -n "$(basename "$0")" -o h: --long help -- "$@") || exit 1
+eval set -- "$args"
+
+while :; do
+    case $1 in
+        -h|--help) Help; exit;;
+        *) shift; break;;
+        \?) echo "Error: Invalid option."; exit;;
+    esac
+done
+{% endif %}
 
 ############################################################
 # Main program.                                            #
@@ -69,10 +81,10 @@ helm upgrade --install raycluster kuberay/ray-cluster \
     --namespace distributed-ray \
     --set image.repository={{ repository }} \
     --set image.tag={{ pod_tag }} \
-    --set worker.replicas=$nreplicas \
+{% if not autoscaling %}    --set worker.replicas=$nreplicas \
     --set worker.maxReplicas=$nmaxreplicas \
     --set worker.resources.requests.cpu=$cpurequests \
     --set worker.resources.limits.cpu=$cpulimits \
     --set worker.resources.requests.memory=$memoryrequests \
     --set worker.resources.limits.memory=$memorylimits \
-    --values "$(dirname $0)/values.yaml"
+{% endif %}    --values "$(dirname $0)/values.yaml"
