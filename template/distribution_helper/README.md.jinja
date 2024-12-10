@@ -31,7 +31,11 @@ Use `build_N_publish_image.sh` to build the pods' image. This script will build 
 Use `deploy.sh` to deploy the RayCluster under the namespace `distributed-ray`.
 
 > **NOTE**  
-> You can overwrite some of the values defined in `deploy.sh` under the "Variable definition" section using the CLI. Use `deploy.sh --help` for more information. Additionally, you can use the configuration file named `values.yaml` to set even more values.
+> You can overwrite some of the values defined in `deploy.sh` under the "Variable definition" section using the CLI. Use `deploy.sh --help` for more information. This is only possible when the autoscaling is not enabled. Additionally, you can use the configuration file named `values.yaml` to set even more values.
+
+**Additional Worker Groups**
+
+If your deployment requires pods with different resource allocations (e.g., some pods using 1 CPU and others using 4 CPUs), you can configure worker groups in the `values.yaml` file. By default, a predefined worker group called `smallGroup` exists under `additionalWorkerGroups`. This group is disabled unless autoscaling is enabled. You can use it as a template for creating additional worker groups—simply duplicate it, rename it, and adjust the resource specifications as needed.
 
 ### 3. Teardown the RayCluster
 
