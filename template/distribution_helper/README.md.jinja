@@ -23,7 +23,7 @@ This is based on [Ray's official documentation](https://docs.ray.io/en/latest/cl
 
 Use `build_N_publish_image.sh` to build the pods' image. This script will build an image named `{{ pod_image }}` and will try to publish it onto DockerHub. **Alternatively**, you can do this step manually by using the Dockerfile to extend your base image (`{{ base_image }}`). **MAKE SURE** to either use this name: `{{ pod_image }}` for the resulting image or to change the name accordingly to what you have chosen in `deploy.sh`.
 
-> [!NOTE]  
+> **NOTE**
 > The base image from which the Ray Pods one will be derived should already have a non-root user.
 
 ### 2. Deploy the RayCluster with the desired ressources
